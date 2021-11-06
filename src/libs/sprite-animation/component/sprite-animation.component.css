@@ -1,0 +1,8 @@
+.animation-container {
+    overflow: hidden;
+    position: relative;
+}
+
+#animation {
+    position: absolute;
+} 

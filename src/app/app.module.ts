@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import { SpriteAnimationModule } from 'src/libs/sprite-animation';
 
 import { AppComponent } from './app.component';
 
@@ -8,7 +9,8 @@ import { AppComponent } from './app.component';
     AppComponent
   ],
   imports: [
-    BrowserModule
+    BrowserModule,
+    SpriteAnimationModule
   ],
   providers: [],
   bootstrap: [AppComponent]

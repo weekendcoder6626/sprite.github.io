@@ -1,0 +1,10 @@
+<div style="position: absolute; left: 10px; top: 30px;">
+
+    <div class="animation-container" [ngStyle]="animationContainerStyle">
+
+        <img id="animation" [style.left.px]="latestLeft || 0" [style.top.px]="latestTop || 0" [width]="totalWidth" [height]="totalHeight" [src]="src"/>
+
+    </div>
+
+</div>
+{{state}}
