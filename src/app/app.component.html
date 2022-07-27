@@ -1,6 +1,43 @@
+<mat-toolbar style="position: fixed">
+    <div style="width: 90%; position: absolute;" fxLayoutAlign="center center">
+        <button mat-icon-button (click)="forwardState()">
+            <mat-icon>play_circle</mat-icon>
+        </button>
+        
+        <button mat-icon-button (click)="pauseState()">
+            <mat-icon>pause_circle</mat-icon>
+        </button>
+        
+        <button mat-icon-button (click)="backwardState()">
+            <mat-icon>fast_rewind</mat-icon>
+        </button>
+        
+        <button mat-icon-button (click)="loop = !loop">
+            <mat-icon>loop</mat-icon>
+        </button>
 
-<button (click)="forwardState()">Forward</button>
-<button (click)="pauseState()">Pause</button>
-<button (click)="backwardState()">Backward</button>
+        {{ animationState }}
+    </div>
 
-<sprite-animation [config]="animationConfig" [state]="animationState"></sprite-animation>
+    <mat-slider thumbLabel aria-label="units" (input)="changeFirstFrame($event)" [displayWith]="formatLabel" min="0" max="57" step="1" [value]="firstFrame"></mat-slider>
+    
+</mat-toolbar>
+
+<div style="position: fixed;" [ngStyle]="positionStyle">
+    
+    <sprite-animation 
+        [scale]="animationScale"
+        [config]="animationConfig" 
+        [loop]="true" 
+        [oscillate]="true"
+        [(currentFrame)]="currentFrame"
+        [(state)]="animationState">
+    </sprite-animation>
+
+</div>
+
+
+
+
+
+ 

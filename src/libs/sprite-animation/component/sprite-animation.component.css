@@ -1,8 +1,13 @@
 .animation-container {
-    overflow: hidden;
+    /* overflow: clip; */
     position: relative;
+    border: solid;
 }
 
 #animation {
     position: absolute;
 } 
+
+.animation-positioning {
+    position: absolute;
+}

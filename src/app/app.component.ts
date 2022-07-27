@@ -1,66 +1,157 @@
-import { Component } from '@angular/core';
-import { AnimationState, DurationUnits, SpriteAnimationConfig } from 'src/libs/sprite-animation';
+import { AfterViewInit, ChangeDetectorRef, Component, Type } from '@angular/core';
+import { MatSliderChange } from '@angular/material/slider';
+import { debounceTime, fromEvent, Observable } from 'rxjs';
+import { animationPositionPresets, AnimationState, SpriteAnimationConfig } from 'src/libs/sprite-animation';
+import { cdAnimationPreset, jigAnimationPreset, leafAnimationPreset, plantAnimationPreset, scrollSections } from './resources/animation-configs';
+import { ScrollSection } from './resources/app.interface';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent {
-  title = 'sprite-animation';
+export class AppComponent implements AfterViewInit{
+  title = 'Sprite Animation';
 
-  animationConfig: SpriteAnimationConfig = {
+  loop = true;
 
-    source: 'assets/plant-animation.png',
+  ch: number;
 
-    originalWidth: 800,
-    originalHeight: 600,
+  animationPreset = cdAnimationPreset;
 
-    scaleFactor: 1,
+  animationState = AnimationState.PAUSE;
 
-    frameRate: 24,
-    firstFrame: 0,
-    lastFrame: 95,
+  currentFrame!: number;
 
-    totalDurationUnit: DurationUnits.FRAMES,
-    totalDuration: 96,
-  };
+  get animationConfig(): SpriteAnimationConfig {
 
-  animationSwitchState = 1;
+    return this.animationPreset.config;
+  }
 
-  get animationState(): AnimationState {
-    switch(this.animationSwitchState) {
-      case 0: {
+  get animationScale(): number {
 
-        return AnimationState.FORWARD;
-      }
+    return this.animationPreset.scale;
+  }
 
-      case 1: {
+  get firstFrame(): number {
 
-        return AnimationState.PAUSE;
-      }
+    return this.animationConfig.firstFrame;
+  }
 
-      case 2: {
+  set firstFrame(v: number) {
 
-        return AnimationState.BACKWARD
-      }
+    this.animationConfig.firstFrame = v;
+  }
 
-      default: {
+  get lastFrame(): number {
 
-        return AnimationState.PAUSE
-      }
+    return this.animationConfig.lastFrame;
+  }
+
+  set lastFrame(v: number) {
+
+    this.animationConfig.lastFrame = v;
+  }
+
+  get positionStyle(): Record<string, string> {
+    
+    return animationPositionPresets.center;
+  }
+
+  constructor() {
+    this.currentFrame = this.firstFrame;
+    this.ch = document.scrollingElement?.getBoundingClientRect().top || 10;
+  }
+
+  ngAfterViewInit() {
+
+    const event = fromEvent(document, 'scroll');
+
+    event.subscribe((e: Event) => {
+
+      this.scrollSectionOperations(e);
+
+    })
+  }
+
+  scrollSectionOperations(e: Event) {
+    const doc = (e.target as Document)
+
+    const scrollTop = doc.scrollingElement!.scrollTop;
+    const clientHeight = doc.scrollingElement!.clientHeight;
+    const scrollHeight = doc.scrollingElement!.scrollHeight;
+
+    const topSection: ScrollSection = {
+      
+      lowerLimit: 0,
+
+      upperLimit: scrollHeight * scrollSections.topSection / 100
+
     }
-  }  
+
+    const midSection: ScrollSection = {
+
+      lowerLimit: topSection.upperLimit,
+
+      upperLimit: topSection.upperLimit + scrollHeight * scrollSections.midSection / 100
+
+    }
+
+    const bottomSection: ScrollSection = {
+      
+      lowerLimit: midSection.upperLimit,
+
+      upperLimit: scrollHeight
+
+    }
+
+    if (this.isTopSection(scrollTop, scrollHeight, clientHeight, topSection)) console.log("Top Section");
+
+    else if (this.isMidSection(scrollTop, scrollHeight, clientHeight, midSection)) console.log("Mid Section");
+
+    else console.log("bottom section")
+
+  } 
+
+  isTopSection(scrollTop: number, scrollHeight: number, clientHeight: number, topSection: ScrollSection): boolean {
+
+    if(scrollTop === 0) return true;
+
+    if(Math.floor(scrollTop + clientHeight * scrollSections.topSection / 100) < topSection.upperLimit) return true;
+
+    return false;
+  }
+
+  isMidSection(scrollTop: number, scrollHeight: number, clientHeight: number, midSection: ScrollSection): boolean {
+
+
+    if(Math.floor(scrollTop + clientHeight * scrollSections.topSection / 100) === midSection.lowerLimit) return true;
+
+    if(Math.floor(scrollTop + clientHeight * (scrollSections.topSection + scrollSections.midSection) / 100) < midSection.upperLimit) return true;
+
+    return false;
+  }
+
+  
+  changeFirstFrame(event: MatSliderChange) {
+
+    this.firstFrame = event.value!;
+  }
+
+  formatLabel(value: number) {
+
+    return value;
+  }
 
   forwardState() {
-    this.animationSwitchState = 0;
+    this.animationState = AnimationState.FORWARD;
   }
 
   pauseState() {
-    this.animationSwitchState = 1;
+    this.animationState = AnimationState.PAUSE;
   }
 
   backwardState() {
-    this.animationSwitchState = 2;
+    this.animationState = AnimationState.BACKWARD;
   }
 }
